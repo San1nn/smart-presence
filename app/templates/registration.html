@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+            position: relative;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 400px;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            margin-bottom: 8px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .input-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .common-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .common-button:hover {
+            background-color: #0056b3;
+        }
+
+        .switch-page-link-container {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .switch-page-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-page-link:hover {
+            text-decoration: underline;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            box-sizing: border-box;
+        }
+
+        .navbar a {
+            margin-left: 25px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/auth/login">Log In</a>
+    </div>
+
+<div class="form-container">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Student Registration</h2>
+        <form id="registrationForm" action="/auth/register" method="post">
+            <!-- Hidden input to ensure the role is always 'student' -->
+            <input type="hidden" name="role" value="student">
+
+            <div class="mb-4">
+                <label for="name" class="input-label">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+            <div class="mb-4">
+                <label for="email" class="input-label">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="input-label">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+            </div>
+            
+            <!-- Student fields are now always visible -->
+            <div class="mb-4">
+                <label for="rollNumber" class="input-label">Roll Number</label>
+                <input type="text" id="rollNumber" name="rollNumber" placeholder="Enter your roll number" required>
+            </div>
+            <div class="mb-4">
+                <label for="studentClass" class="input-label">Class</label>
+                <input type="text" id="studentClass" name="studentClass" placeholder="e.g., Computer Science B" required>
+            </div>
+            
+            <button type="submit" class="common-button">Sign Up</button>
+        </form>
+
+        <div class="switch-page-link-container">
+            Already have an account? <a href="/auth/login" class="switch-page-link">Log in</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Presence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+            position: relative;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 400px;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        /* --- FIX: Added style for consistency with registration page --- */
+        .input-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            margin-bottom: 8px;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .common-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .common-button:hover {
+            background-color: #0056b3;
+        }
+
+        .switch-page-link-container {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .switch-page-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-page-link:hover {
+            text-decoration: underline;
+        }
+        
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            box-sizing: border-box;
+        }
+
+        .navbar a {
+            margin-left: 25px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        /* --- NEW: Style for displaying error messages --- */
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/auth/register">Sign Up</a>
+    </div>
+
+    <div class="form-container">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Welcome Back</h2>
+        
+        <!-- --- NEW: Placeholder for error messages from the backend --- -->
+        <!-- To use this, your backend must pass an 'error' variable to the template -->
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form action="/auth/login" method="post">
+            <div class="mb-4">
+                <!-- --- FIX: Linked label to input for accessibility --- -->
+                <label for="email" class="input-label">Email</label>
+                <input type="email" id="email" name="username" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-4">
+                <!-- --- FIX: Linked label to input for accessibility --- -->
+                <label for="password" class="input-label">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="common-button">Log In</button>
+        </form>
+
+        <div class="switch-page-link-container">
+            Don't have an account? <a href="/auth/register" class="switch-page-link">Sign up</a>
+        </div>
+    </div>
+</body>
+</html>

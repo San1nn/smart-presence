@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Face Registration via Webcam</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #495057;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 650px;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: white;
+            font-size: 1rem;
+        }
+        .webcam-container {
+            display: none;
+            margin-top: 1rem;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        #webcamVideo {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 6px;
+            background-color: #333;
+        }
+        .thumbnails-container {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 80px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .thumbnails-container img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #007bff;
+        }
+        button {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 0.5rem;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background-color: #a0c9e8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #statusMessage {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            padding: 0.75rem;
+            border-radius: 6px;
+            display: none;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        hr { margin: 2rem 0; border-color: #e9ecef; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Webcam Face Registration</h1>
+    
+    <div class="form-group">
+        <label for="studentSelector">Select Student:</label>
+        <select id="studentSelector">
+            <option value="" disabled selected>Loading students...</option>
+        </select>
+    </div>
+
+    <div id="webcamContainer" class="webcam-container">
+        <video id="webcamVideo" autoplay playsinline></video>
+        <button id="captureBtn" disabled>Capture Face (0/10)</button>
+        <label style="margin-top: 1rem;">Captured Images:</label>
+        <div id="thumbnails" class="thumbnails-container"></div>
+    </div>
+    
+    <button id="submitBtn" disabled>Register Faces</button>
+    <div id="statusMessage"></div>
+    <hr>
+    <button id="trainBtn" style="background-color: #28a745;">Train Model</button>
+</div>
+
+<script>
+    const studentSelector = document.getElementById('studentSelector');
+    const webcamContainer = document.getElementById('webcamContainer');
+    const video = document.getElementById('webcamVideo');
+    const captureBtn = document.getElementById('captureBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const trainBtn = document.getElementById('trainBtn');
+    const thumbnailsContainer = document.getElementById('thumbnails');
+    const statusMessage = document.getElementById('statusMessage');
+
+    const MAX_CAPTURES = 10;
+    let capturedImages = [];
+    let stream;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/face-recognition/students-for-registration');
+            if (!response.ok) throw new Error('Failed to fetch student list.');
+            
+            const students = await response.json();
+            
+            studentSelector.innerHTML = '<option value="" disabled selected>Select a student</option>';
+            if (students.length === 0) {
+                studentSelector.innerHTML = '<option value="" disabled selected>No students found</option>';
+                return;
+            }
+
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.roll_number;
+                option.textContent = `${student.name} (${student.roll_number})`;
+                option.dataset.name = student.name;
+                studentSelector.appendChild(option);
+            });
+        } catch (error) {
+            showStatus('Error loading student list. Please refresh.', 'error');
+        }
+    });
+
+    studentSelector.addEventListener('change', async (event) => {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        resetCaptureState();
+
+        if (!event.target.value) {
+            webcamContainer.style.display = 'none';
+            return;
+        }
+
+        webcamContainer.style.display = 'block';
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = stream;
+            captureBtn.disabled = false;
+        } catch (err) {
+            showStatus('Could not access webcam. Please check permissions.', 'error');
+            webcamContainer.style.display = 'none';
+        }
+    });
+
+    captureBtn.addEventListener('click', () => {
+        if (capturedImages.length >= MAX_CAPTURES) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        capturedImages.push(dataUrl);
+
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        thumbnailsContainer.appendChild(img);
+        updateButtonStates();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        const selectedOption = studentSelector.options[studentSelector.selectedIndex];
+        const rollNumber = selectedOption.value;
+        const name = selectedOption.dataset.name;
+
+        if (!rollNumber || capturedImages.length === 0) return;
+
+        setLoadingState(true, 'Registering...');
+        try {
+            const response = await fetch('/face-recognition/register-faces', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roll_number: rollNumber,
+                    name: name,
+                    images: capturedImages
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showStatus(data.message, 'success');
+                resetCaptureState();
+            } else {
+                showStatus(data.detail || 'An error occurred.', 'error');
+            }
+        } catch (error) {
+            showStatus('Failed to connect to the server.', 'error');
+        } finally {
+            setLoadingState(false);
+        }
+    });
+
+    trainBtn.addEventListener('click', async function() {
+        setLoadingState(true, 'Training...');
+        showStatus('Training started... This may take a moment.', 'info');
+        try {
+            const response = await fetch('/face-recognition/train', { method: 'POST' });
+            const data = await response.json();
+            showStatus(data.message, response.ok ? 'success' : 'error');
+        } catch (error) {
+            showStatus('Failed to connect to the server.', 'error');
+        } finally {
+            setLoadingState(false);
+        }
+    });
+
+    function updateButtonStates() {
+        const count = capturedImages.length;
+        captureBtn.textContent = `Capture Face (${count}/${MAX_CAPTURES})`;
+        captureBtn.disabled = count >= MAX_CAPTURES;
+        submitBtn.disabled = count === 0;
+    }
+
+    function resetCaptureState() {
+        capturedImages = [];
+        thumbnailsContainer.innerHTML = '';
+        updateButtonStates();
+    }
+
+    function showStatus(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = type;
+        statusMessage.style.display = 'block';
+    }
+
+    function setLoadingState(isLoading, message = '') {
+        const elements = [submitBtn, trainBtn, captureBtn, studentSelector];
+        elements.forEach(el => el.disabled = isLoading);
+        if (isLoading) submitBtn.textContent = message;
+        else submitBtn.textContent = 'Register Faces';
+    }
+</script>
+</body>
+</html>

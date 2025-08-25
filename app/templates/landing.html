@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Smart Presence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --card-bg: #ffffff;
+            --text-color: #343a40;   
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            
+            /* --- CORRECTED BACKGROUND IMAGE PATH --- */
+            /* Use the URL path, not the local file system path */
+            background-image: url('/static/images/im.png');
+            
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        .navbar {
+            background-color: rgba(255,255,255,0.9);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 12px 12px;
+            z-index: 1;
+            position: relative;
+        }
+        
+        /* Logo Styles */
+        .navbar .logo { display: flex; align-items: center; text-decoration: none; }
+        .navbar .logo img { height: 40px; margin-right: 10px; border-radius: 5px; } /* Added border-radius */
+        .navbar .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        
+        .navbar .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .navbar .nav-links a:hover { color: var(--primary-color); }
+        .navbar .nav-links .button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navbar .nav-links .button:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; position: relative; z-index: 1; }
+        .welcome-banner {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 3rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            animation: fadeIn 1.2s ease-in-out;
+        }
+        .welcome-banner h1 {
+            margin-top: 0;
+            font-size: 2.5rem;
+            color: var(--primary-hover);
+        }
+        .welcome-banner p {
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .welcome-banner .logo-in-banner {
+             height: 80px; /* Larger logo inside the banner */
+             margin-bottom: 1rem;
+        }
+
+        /* Fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body> <!-- The `background` attribute on the body tag is deprecated. The CSS `background-image` is the correct way. -->
+
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <!-- Use the URL path for the navbar logo -->
+            <img src="/static/images/logo.jpeg" alt="SmartPresence Logo">
+            <span class="logo-text">SmartPresence</span>
+        </a>
+        <div class="nav-links">
+            <a href="/auth/register">Register</a>
+            <a href="/auth/login" class="button">Login</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="welcome-banner">
+            <!-- --- CORRECTED LOGO IMAGE PATH --- -->
+            <!-- Use the URL path, not the local file system path -->
+            <img class="logo-in-banner" src="/static/images/logo.jpeg" alt="Company Logo">
+            <h1>Welcome to the Future of Attendance</h1>
+            <p>An automated, intelligent system to track presence using face recognition.</p>
+            <p>Please log in or register to continue.</p>
+        </div>
+    </div>
+</body>
+</html>

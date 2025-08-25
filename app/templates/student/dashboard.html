@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard - Smart Presence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #28a745; /* Green for student role */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #343a40;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .navbar .nav-links span {
+            font-weight: 500;
+        }
+        .navbar .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .navbar .nav-links .logout-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navbar .nav-links .logout-button:hover {
+            background-color: #c82333;
+        }
+        .container {
+            flex-grow: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            box-sizing: border-box;
+        }
+        .dashboard-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        .dashboard-header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .dashboard-header .role-badge {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.3em 0.8em;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.07);
+        }
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--primary-hover);
+        }
+        .card p {
+            color: var(--light-text);
+            margin-bottom: 1.5rem;
+        }
+        .card a.card-link {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+        .card a.card-link:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+            font-size: 0.9em;
+            color: var(--light-text);
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">SmartPresence</a>
+        <div class="nav-links">
+            <span>Welcome, {{ user.name }}!</span>
+            <a href="/auth/logout" class="logout-button">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Your Dashboard <span class="role-badge">{{ user.role }}</span></h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>View My Attendance</h3>
+                <p>Check your attendance records and summaries for all subjects.</p>
+                <a href="#" class="card-link">View Details &rarr;</a>
+            </div>
+            <div class="card">
+                <h3>My Subjects</h3>
+                <p>See a list of all subjects you are currently enrolled in.</p>
+                <a href="#" class="card-link">View Subjects &rarr;</a>
+            </div>
+            <div class="card">
+                <h3>Profile Settings</h3>
+                <p>Update your personal information and change your password.</p>
+                <a href="#" class="card-link">Edit Profile &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 SmartPresence. All rights reserved.</p>
+    </footer>
+</body>
+</html>
