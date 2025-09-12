@@ -3,85 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard</title>
+    <title>Teacher Dashboard - Smart Presence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f4f4f9;
+        /* --- MASTER CSS FOR TEACHER MODULE --- */
+        :root {
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --sidebar-bg: #2c3e50;
+            --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff;
+            --sidebar-link-active: var(--primary-color);
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #34495e;
+            --light-text: #7f8c8d;
+            --border-color: #e5e7eb;
+            --danger: #e74c3c;
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
         .dashboard-container {
             display: flex;
+            min-height: 100vh;
         }
+
+        /* --- Sidebar --- */
         .sidebar {
-            width: 250px;
-            background-color: #343a40;
+            width: 260px;
+            background-color: var(--sidebar-bg);
             color: white;
             padding: 20px;
-            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar-header {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--sidebar-link-hover);
+        }
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        .sidebar-nav a {
+            color: var(--sidebar-link);
+            text-decoration: none;
+            padding: 12px 15px;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+        }
+        .sidebar-nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--sidebar-link-hover);
+        }
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-link-active);
+            color: var(--sidebar-link-hover);
+            font-weight: 600;
+        }
+        .sidebar-icon {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
+        .user-profile {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        .user-profile .logout-button {
+            display: block;
+            background-color: var(--danger);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .page-header {
+            margin-bottom: 40px;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .page-header p {
+            color: var(--light-text);
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        /* --- Cards --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
         }
-        .sidebar a {
-            color: #adb5bd;
-            text-decoration: none;
-            padding: 10px 0;
-            display: flex;
-            align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
         }
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #495057;
-            color: white;
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
         }
-        .sidebar-title {
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #fff;
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
-        .sidebar-icon {
-            margin-right: 15px;
-        }
-        .main-content {
+        .card p {
+            color: var(--light-text);
+            font-size: 0.95rem;
+            line-height: 1.6;
             flex-grow: 1;
-            padding: 20px;
         }
-        .header {
-            background-color: #fff;
-            padding: 20px;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 20px;
+        .card-link {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 1rem;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <div class="sidebar">
-            <div class="sidebar-title">Teacher Dashboard</div>
-            <a href="#">
-                <span class="sidebar-icon">&#x1F3E0;</span> Dashboard
-            </a>
-            <a href="#">
-                <span class="sidebar-icon">&#x1F4DA;</span> Classes
-            </a>
-            <a href="#">
-                <span class="sidebar-icon">&#x1F9D1;</span> Students
-            </a>
-            <a href="#">
-                <span class="sidebar-icon">&#x1F4DD;</span> Assignments
-            </a>
-            <a href="/face-recognition/recognize" class="active">
-                <span class="sidebar-icon">&#x1F464;</span> Scan & Register Faces
-            </a>
-        </div>
-        <div class="main-content">
-            <div class="header">
-                <h2>Welcome, Teacher!</h2>
+        <aside class="sidebar">
+            <div class="sidebar-header">SmartPresence</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="active"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/teacher/my-classes"><span class="sidebar-icon">📚</span> My Classes</a>
+                <a href="/teacher/attendance-reports"><span class="sidebar-icon">📊</span> Reports</a>
+                <a href="/teacher/timetable"><span class="sidebar-icon">🗓️</span> Timetable</a>
+                <a href="/face-recognition/recognize"><span class="sidebar-icon">📸</span> Face Registration</a>
+            </nav>
+            <div class="user-profile">
+                <a href="/auth/logout" class="logout-button">Logout</a>
             </div>
-            <iframe id="faceRecognitionFrame" src="/face-recognition/recognize" style="width: 100%; height: 80vh; border: none;"></iframe>
-        </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Welcome Back, {{ user.name }}!</h1>
+                <p>Here's a quick overview of your teaching activities.</p>
+            </header>
+
+            <section class="card-grid">
+                <a href="/teacher/bulk-attendance" class="card">
+                    <div class="card-icon">🖼️</div>
+                    <h3>Bulk Attendance</h3>
+                    <p>Mark attendance for multiple students at once from a single group photo.</p>
+                    <span class="card-link">Upload Photo &rarr;</span>
+                </a>
+                 <a href="/teacher/realtime-attendance" class="card">
+                    <div class="card-icon">📷</div>
+                    <h3>Live Attendance</h3>
+                    <p>Start a real-time webcam session to mark students as they appear.</p>
+                    <span class="card-link">Start Live Session &rarr;</span>
+                </a>
+                <a href="/teacher/my-classes" class="card">
+                    <div class="card-icon">📚</div>
+                    <h3>Manage Classes</h3>
+                    <p>Add, edit, or delete your classes and view the student roster for each.</p>
+                    <span class="card-link">View My Classes &rarr;</span>
+                </a>
+                <a href="/teacher/attendance-reports" class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Attendance Reports</h3>
+                    <p>View detailed attendance summaries and analytics for all your subjects.</p>
+                    <span class="card-link">View Reports &rarr;</span>
+                </a>
+            </section>
+        </main>
     </div>
 </body>
 </html>

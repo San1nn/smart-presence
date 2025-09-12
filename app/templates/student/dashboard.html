@@ -2,179 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Dashboard - Smart Presence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Smart Presence</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --secondary-color: #28a745; /* Green for student role */
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #343a40;
-            --light-text: #6c757d;
-            --border-color: #dee2e6;
+            --primary-color: #2980b9; --sidebar-bg: #34495e; --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff; --sidebar-link-active: #2980b9; --bg-color: #ecf0f1;
+            --card-bg: #ffffff; --text-color: #34495e; --light-text: #7f8c8d;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .navbar {
-            background-color: var(--card-bg);
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .navbar .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        .navbar .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .navbar .nav-links span {
-            font-weight: 500;
-        }
-        .navbar .nav-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .navbar .nav-links .logout-button {
-            background-color: #dc3545;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .navbar .nav-links .logout-button:hover {
-            background-color: #c82333;
-        }
-        .container {
-            flex-grow: 1;
-            max-width: 1100px;
-            width: 100%;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            box-sizing: border-box;
-        }
-        .dashboard-header {
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-        .dashboard-header h1 {
-            font-size: 2.2rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .dashboard-header .role-badge {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.3em 0.8em;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.07);
-        }
-        .card h3 {
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            color: var(--primary-hover);
-        }
-        .card p {
-            color: var(--light-text);
-            margin-bottom: 1.5rem;
-        }
-        .card a.card-link {
-            text-decoration: none;
-            color: var(--primary-color);
-            font-weight: 600;
-            display: inline-block;
-            transition: color 0.3s;
-        }
-        .card a.card-link:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-        .footer {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: auto;
-            font-size: 0.9em;
-            color: var(--light-text);
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        .header h1 { font-size: 2.5rem; }
+        .header p { color: var(--light-text); font-size: 1.1rem; }
+        .actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 30px; }
+        .action-card { background: var(--card-bg); border-radius: 12px; padding: 25px; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; }
+        .action-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .action-card h3 { color: var(--primary-color); }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="/" class="logo">SmartPresence</a>
-        <div class="nav-links">
-            <span>Welcome, {{ user.name }}!</span>
-            <a href="/auth/logout" class="logout-button">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="dashboard-header">
-            <h1>Your Dashboard <span class="role-badge">{{ user.role }}</span></h1>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>View My Attendance</h3>
-                <p>Check your attendance records and summaries for all subjects.</p>
-                <a href="#" class="card-link">View Details &rarr;</a>
-            </div>
-            <div class="card">
-                <h3>My Subjects</h3>
-                <p>See a list of all subjects you are currently enrolled in.</p>
-                <a href="#" class="card-link">View Subjects &rarr;</a>
-            </div>
-            <div class="card">
-                <h3>Profile Settings</h3>
-                <p>Update your personal information and change your password.</p>
-                <a href="#" class="card-link">Edit Profile &rarr;</a>
-            </div>
-        </div>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Student Portal</div>
+            <nav class="sidebar-nav">
+                <a href="/student/dashboard" class="active"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/student/my-attendance"><span class="sidebar-icon">📈</span> My Attendance</a>
+                <a href="/student/assignments"><span class="sidebar-icon">📚</span> Assignments</a>
+                <a href="/student/leave-application"><span class="sidebar-icon">✉️</span> Apply for Leave</a>
+                <a href="/student/fees"><span class="sidebar-icon">💳</span> Fee Payment</a>
+                <a href="/student/campus-services"><span class="sidebar-icon">🏛️</span> Campus Services</a>
+                <a href="/student/feedback"><span class="sidebar-icon">💬</span> Feedback</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>Welcome, {{ user.name }}!</h1>
+                <p>Your central hub for academics, services, and campus life.</p>
+            </header>
+            <section class="actions-grid">
+                <a href="/student/my-attendance" class="action-card"><h3>My Attendance</h3><p>Track your attendance records and receive low-attendance alerts.</p></a>
+                <a href="/student/assignments" class="action-card"><h3>Assignments & Exams</h3><p>Submit assignments, view grades, and access online exam schedules.</p></a>
+                <a href="/student/fees" class="action-card"><h3>Fee Remittance</h3><p>Pay tuition and other fees online and view payment history.</p></a>
+                <a href="/student/leave-application" class="action-card"><h3>Apply for Leave</h3><p>Submit leave applications and track their approval status.</p></a>
+                <a href="/student/campus-services" class="action-card"><h3>Campus Services</h3><p>Access library, placement cell, hostel, and transport facilities.</p></a>
+                <a href="/student/feedback" class="action-card"><h3>Feedback & Suggestions</h3><p>Provide valuable feedback on faculty and services.</p></a>
+            </section>
+        </main>
     </div>
-
-    <footer class="footer">
-        <p>&copy; 2025 SmartPresence. All rights reserved.</p>
-    </footer>
 </body>
 </html>

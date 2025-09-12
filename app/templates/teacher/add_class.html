@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Class - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff; --primary-hover: #0056b3; --sidebar-bg: #2c3e50;
+            --sidebar-link: #bdc3c7; --sidebar-link-hover: #ffffff; --sidebar-link-active: #3498db;
+            --bg-color: #f4f6f9; --card-bg: #ffffff; --text-color: #343a40;
+            --light-text: #6c757d; --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); font-weight: 600; }
+        .main-content { flex-grow: 1; padding: 30px; }
+        .header h1 { font-size: 2.2rem; }
+        .header p { color: var(--light-text); }
+        .form-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 30px; padding: 30px; max-width: 700px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        .form-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .action-btn { padding: 12px 25px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; border: none; }
+        .primary-btn { background-color: var(--primary-color); color: white; }
+        .secondary-btn { background-color: #e9ecef; color: var(--text-color); }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">SmartPresence</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/teacher/my-classes" class="active"><span class="sidebar-icon">📚</span> My Classes</a>
+                <!-- ... other links -->
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>Add a New Class</h1>
+                <p>Fill out the details below to create a new subject.</p>
+            </header>
+            <div class="form-container">
+                <form action="/teacher/add-class" method="post">
+                    <div class="form-group">
+                        <label for="subject_name">Subject Name</label>
+                        <input type="text" id="subject_name" name="subject_name" placeholder="e.g., Introduction to Python" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject_description">Description (Optional)</label>
+                        <textarea id="subject_description" name="subject_description" placeholder="A brief summary of the class curriculum."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="action-btn primary-btn">Create Class</button>
+                        <a href="/teacher/my-classes" class="action-btn secondary-btn">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

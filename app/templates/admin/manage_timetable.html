@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Timetables - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
+            --sidebar-link-active: #3498db; --bg-color: #ecf0f1; --card-bg: #ffffff;
+            --text-color: #34495e; --border-color: #e5e7eb;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); font-weight: 600; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        .header h1 { font-size: 2.5rem; }
+        .form-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 30px; padding: 30px; max-width: 600px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .form-group select, .form-group input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        .time-inputs { display: flex; gap: 15px; }
+        .action-btn { padding: 12px 25px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; background-color: var(--primary-color); color: white; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Admin Panel</div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> Manage Users</a>
+                <!-- This is now the active page -->
+                <a href="/admin/manage-timetable" class="active"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <!-- ... (inside the <main class="main-content"> section) ... -->
+<div class="main-content-header">
+    <header class="header">
+        <h1>Create Class Schedule</h1>
+    </header>
+    <!-- ADD THIS NEW BUTTON -->
+    <a href="/admin/timetable-preview" class="back-btn">View Full Timetable &rarr;</a>
+</div>
+<!-- ... (rest of the page with the form) ... -->
+            <header class="header"><h1>Create Class Schedule</h1></header>
+            <div class="form-container">
+                <form action="/admin/manage-timetable" method="post">
+                    <div class="form-group">
+                        <label for="teacher_id">Select Teacher</label>
+                        <select id="teacher_id" name="teacher_id" required>
+                            <option value="" disabled selected>Choose a teacher...</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.userID }}">{{ teacher.name }} ({{ teacher.email }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject_id">Select Subject</label>
+                        <select id="subject_id" name="subject_id" required>
+                            <option value="" disabled selected>Choose a subject...</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.subjectID }}">{{ subject.subjectName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="day_of_week">Day of the Week</label>
+                        <select id="day_of_week" name="day_of_week" required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="form-group time-inputs">
+                        <div style="flex: 1;">
+                            <label for="start_time">Start Time</label>
+                            <input type="time" id="start_time" name="start_time" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="end_time">End Time</label>
+                            <input type="time" id="end_time" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location (Optional)</label>
+                        <input type="text" id="location" name="location" placeholder="e.g., Room 404, Online">
+                    </div>
+                    <button type="submit" class="action-btn">Create Schedule</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Timetable - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff; --sidebar-link-active: #3498db; --bg-color: #f4f6f9;
+            --card-bg: #ffffff; --text-color: #343a40; --light-text: #6c757d; --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); font-weight: 600; }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
+        .user-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .main-content { flex-grow: 1; padding: 30px; }
+        .header h1 { font-size: 2.2rem; margin: 0; }
+        .header p { color: var(--light-text); }
+        .timetable-container {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .day-column { background-color: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .day-header { padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 1.1rem; border-radius: 8px 8px 0 0; }
+        .day-events { padding: 15px; }
+        .class-event {
+            background-color: #e9f5ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .class-event h4 { margin: 0 0 5px 0; color: var(--text-color); }
+        .class-event p { margin: 0; font-size: 0.9em; color: var(--light-text); }
+        .no-classes { color: var(--light-text); text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">SmartPresence</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/teacher/my-classes"><span class="sidebar-icon">📚</span> My Classes</a>
+                <a href="/teacher/attendance-reports"><span class="sidebar-icon">📊</span> Reports</a>
+                <!-- This will be the active page -->
+                <a href="/teacher/timetable" class="active"><span class="sidebar-icon">🗓️</span> Timetable</a>
+                <a href="/face-recognition/recognize"><span class="sidebar-icon">📸</span> Scan & Register</a>
+            </nav>
+            <div class="user-profile">
+                <p>Welcome, {{ user.name }}</p>
+                <a href="/auth/logout">Logout</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>My Weekly Timetable</h1>
+                <p>Here is your schedule for the upcoming week.</p>
+            </header>
+            <div class="timetable-container">
+                {% for day in days_order %}
+                <div class="day-column">
+                    <div class="day-header">{{ day }}</div>
+                    <div class="day-events">
+                        {% if timetable[day] %}
+                            {% for schedule in timetable[day] %}
+                            <div class="class-event">
+                                <h4>{{ schedule.subject.subjectName }}</h4>
+                                <!-- Format the time to be more readable (e.g., 09:00 AM) -->
+                                <p>🕒 {{ schedule.start_time.strftime('%I:%M %p') }} - {{ schedule.end_time.strftime('%I:%M %p') }}</p>
+                                <p>📍 {{ schedule.location }}</p>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-classes">No classes scheduled.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

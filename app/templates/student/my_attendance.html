@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance - Student Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2980b9; --sidebar-bg: #34495e; --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff; --sidebar-link-active: #2980b9; --bg-color: #ecf0f1;
+            --card-bg: #ffffff; --text-color: #34495e; --light-text: #7f8c8d; --border-color: #e5e7eb;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        .header h1 { font-size: 2.5rem; }
+        .header p { color: var(--light-text); font-size: 1.1rem; }
+        .attendance-table-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 30px; overflow: hidden; }
+        .attendance-table { width: 100%; border-collapse: collapse; }
+        .attendance-table th, .attendance-table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .attendance-table thead { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Student Portal</div>
+            <nav class="sidebar-nav">
+                <a href="/student/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/student/my-attendance" class="active"><span class="sidebar-icon">📈</span> My Attendance</a>
+                <a href="/student/assignments"><span class="sidebar-icon">📚</span> Assignments</a>
+                <a href="/student/leave-application"><span class="sidebar-icon">✉️</span> Apply for Leave</a>
+                <a href="/student/fees"><span class="sidebar-icon">💳</span> Fee Payment</a>
+                <a href="/student/campus-services"><span class="sidebar-icon">🏛️</span> Campus Services</a>
+                <a href="/student/feedback"><span class="sidebar-icon">💬</span> Feedback</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <h1>My Attendance Summary</h1>
+                <p>A summary of your attendance across all subjects.</p>
+            </header>
+            <div class="attendance-table-container">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Attendance Percentage</th>
+                            <th>Classes Attended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- This part will be filled dynamically later -->
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 20px;">No attendance data available yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

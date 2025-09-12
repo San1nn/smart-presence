@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Preview - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
+            --sidebar-link-active: #3498db; --bg-color: #ecf0f1; --card-bg: #ffffff;
+            --text-color: #34495e; --light-text: #7f8c8d; --border-color: #e5e7eb;
+            --header-blue: #00A9E0; --header-pink: #FF6B6B;
+        }
+        /* --- Standard Admin Panel Styles --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); font-weight: 600; }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        .main-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; color: var(--text-color); }
+        .back-btn { background-color: var(--primary-color); color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; }
+        
+        /* --- Timetable Grid Styles --- */
+        .timetable-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 120px repeat(5, 1fr); /* Time column + 5 weekdays */
+            gap: 5px;
+        }
+        .grid-cell {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            min-height: 60px;
+        }
+        .grid-header { font-size: 1.1rem; color: white; }
+        .header-time { background-color: #95a5a6; }
+        .header-day { background-color: var(--header-pink); }
+        .header-day.alt { background-color: var(--header-blue); }
+        .grid-slot {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            align-items: flex-start;
+            justify-content: flex-start;
+            flex-direction: column;
+            padding: 8px;
+        }
+        .class-event {
+            background-color: #e9f5ff;
+            border-left: 5px solid #007bff;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+        .class-event .subject { font-weight: 600; color: #0056b3; }
+        .class-event .teacher { color: var(--light-text); font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Admin Panel</div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> Manage Users</a>
+                <a href="/admin/manage-teachers"><span class="sidebar-icon">🧑‍🏫</span> Manage Teachers</a>
+                <a href="/admin/manage-subjects"><span class="sidebar-icon">📚</span> Manage Subjects</a>
+                <a href="/admin/manage-timetable" class="active"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="main-content-header">
+                <header class="header"><h1>Full Timetable Preview</h1></header>
+                <a href="/admin/manage-timetable" class="back-btn">&larr; Back to Timetable Editor</a>
+            </div>
+            <div class="timetable-container">
+                <div class="timetable-grid">
+                    <!-- Header Row -->
+                    <div class="grid-cell grid-header header-time">TIME</div>
+                    <div class="grid-cell grid-header header-day">MONDAY</div>
+                    <div class="grid-cell grid-header header-day alt">TUESDAY</div>
+                    <div class="grid-cell grid-header header-day">WEDNESDAY</div>
+                    <div class="grid-cell grid-header header-day alt">THURSDAY</div>
+                    <div class="grid-cell grid-header header-day">FRIDAY</div>
+
+                    {% set time_slots = [
+                        ("07:00", "7:00-8:00"), ("08:00", "8:00-9:00"), ("09:00", "9:00-10:00"),
+                        ("10:00", "10:00-11:00"), ("13:00", "1:00-2:00"), ("14:00", "2:00-3:00"),
+                        ("15:00", "3:00-4:00"), ("16:00", "4:00-5:00")
+                    ] %}
+
+                    {% for time_key, time_label in time_slots %}
+                        <div class="grid-cell header-time">{{ time_label }}</div>
+                        {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] %}
+                            <div class="grid-cell grid-slot">
+                                {% for schedule in timetable[day] %}
+                                    {% if schedule.start_time.strftime('%H:%M') == time_key %}
+                                        <div class="class-event">
+                                            <div class="subject">{{ schedule.subject.subjectName }}</div>
+                                            <div class="teacher">{{ schedule.subject.teacher.name or 'Unassigned' }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

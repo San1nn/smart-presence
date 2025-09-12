@@ -31,7 +31,6 @@
             text-align: left;
         }
 
-        /* --- FIX: Added style for consistency with registration page --- */
         .input-label {
             font-size: 16px;
             font-weight: 500;
@@ -113,7 +112,6 @@
             font-size: 16px;
         }
 
-        /* --- NEW: Style for displaying error messages --- */
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
@@ -134,20 +132,16 @@
     <div class="form-container">
         <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Welcome Back</h2>
         
-        <!-- --- NEW: Placeholder for error messages from the backend --- -->
-        <!-- To use this, your backend must pass an 'error' variable to the template -->
         {% if error %}
             <div class="error-message">{{ error }}</div>
         {% endif %}
         
         <form action="/auth/login" method="post">
             <div class="mb-4">
-                <!-- --- FIX: Linked label to input for accessibility --- -->
                 <label for="email" class="input-label">Email</label>
                 <input type="email" id="email" name="username" placeholder="Enter your email" required>
             </div>
             <div class="mb-4">
-                <!-- --- FIX: Linked label to input for accessibility --- -->
                 <label for="password" class="input-label">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </div>
@@ -158,5 +152,8 @@
             Don't have an account? <a href="/auth/register" class="switch-page-link">Sign up</a>
         </div>
     </div>
+
+    <!-- The problematic JavaScript block that was here has been removed. -->
+
 </body>
 </html>

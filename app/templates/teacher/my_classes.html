@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Classes - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff; --sidebar-link-active: #3498db; --bg-color: #f4f6f9;
+            --card-bg: #ffffff; --text-color: #343a40; --light-text: #6c757d; --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar-header { font-size: 1.6rem; font-weight: 700; text-align: center; margin-bottom: 2.5rem; color: var(--sidebar-link-hover); }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; transition: all 0.3s ease; font-weight: 500; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); font-weight: 600; }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; width: 24px; text-align: center; }
+        .user-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .main-content { flex-grow: 1; padding: 30px; }
+        .main-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.2rem; margin: 0; }
+        .header p { color: var(--light-text); }
+        .add-class-btn { background-color: var(--primary-color); color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .card { background: var(--card-bg); border-radius: 8px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .class-stats { margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .card-actions { margin-top: auto; display: flex; gap: 10px; }
+        .action-btn { flex-grow: 1; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; font-weight: 500; }
+        .action-btn.primary { background-color: var(--primary-color); color: white; }
+        .action-btn.secondary { background-color: #e9ecef; color: var(--text-color); }
+
+        /* --- NEW STYLES for management buttons --- */
+        .card-management {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .manage-btn { padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: 500; font-size: 0.9em; border: none; cursor: pointer; }
+        .edit-btn { background-color: #ffc107; color: #212529; }
+        .edit-btn:hover { background-color: #e0a800; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .delete-btn:hover { background-color: #c82333; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">SmartPresence</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/teacher/my-classes" class="active"><span class="sidebar-icon">📚</span> My Classes</a>
+                <a href="/teacher/attendance-reports"><span class="sidebar-icon">📊</span> Reports</a>
+                <a href="/face-recognition/recognize"><span class="sidebar-icon">📸</span> Scan & Register</a>
+            </nav>
+            <div class="user-profile">
+                <p>Welcome, {{ user.name }}</p>
+                <a href="/auth/logout" class="logout-button">Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- ... (inside the <main class="main-content"> section) ... -->
+<div class="main-content-header">
+    <header class="header">
+        <h1>My Classes</h1>
+        <p>Manage your subjects, view rosters, and take attendance.</p>
+    </header>
+    <!-- UPDATE THIS BUTTON to be a link -->
+    <a href="/teacher/add-class" class="add-class-btn">+ Add New Class</a>
+</div>
+<!-- ... (rest of the page) ... -->
+            <div class="main-content-header">
+                <header class="header"><h1>My Classes</h1><p>Manage your subjects and view class rosters.</p></header>
+                <a href="/teacher/add-class" class="add-class-btn">+ Add New Class</a>
+            </div>
+            <section class="class-grid">
+                {% for data in classes %}
+                <div class="card">
+                    <h3>{{ data.subject.subjectName }}</h3>
+                    <p>{{ data.subject.description or "No description provided." }}</p>
+                    <div class="class-stats"><span>🧑‍🎓 {{ data.student_count }} Students Enrolled</span></div>
+                    <div class="card-actions">
+                        <a href="/teacher/class/{{ data.subject.subjectID }}" class="action-btn secondary">View Roster</a>
+                        <a href="/face-recognition/recognize" class="action-btn primary">Take Attendance</a>
+                    </div>
+                    <!-- --- ADD THIS MANAGEMENT BLOCK --- -->
+                    <div class="card-management">
+                        <a href="/teacher/edit-class/{{ data.subject.subjectID }}" class="manage-btn edit-btn">Edit</a>
+                        <form action="/teacher/delete-class/{{ data.subject.subjectID }}" method="post" onsubmit="return confirm('Are you sure you want to delete this class? All associated attendance records will also be removed.');">
+                            <button type="submit" class="manage-btn delete-btn">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <p>You have no classes assigned. Click "Add New Class" to get started.</p>
+                {% endfor %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

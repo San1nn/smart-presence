@@ -3,291 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Face Registration via Webcam</title>
+    <title>Face Registration - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            color: #495057;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+        :root {
+            --primary-color: #007bff; --primary-hover: #0056b3; --danger: #dc3545;
+            --success: #28a745; --info: #17a2b8; --bg-color: #f4f6f9;
+            --card-bg: #ffffff; --text-color: #343a40; --border-color: #dee2e6;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 650px;
-        }
-        h1 {
-            text-align: center;
-            color: #343a40;
-            margin-bottom: 2rem;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.6rem;
-            font-weight: 600;
-        }
-        select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            box-sizing: border-box;
-            background-color: white;
-            font-size: 1rem;
-        }
-        .webcam-container {
-            display: none;
-            margin-top: 1rem;
-            text-align: center;
-            border: 1px solid #ddd;
-            padding: 1rem;
-            border-radius: 8px;
-        }
-        #webcamVideo {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            border-radius: 6px;
-            background-color: #333;
-        }
-        .thumbnails-container {
-            margin-top: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            min-height: 80px;
-            border: 1px dashed #ccc;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .thumbnails-container img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 2px solid #007bff;
-        }
-        button {
-            width: 100%;
-            padding: 0.9rem;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 0.5rem;
-        }
-        button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            background-color: #a0c9e8;
-            cursor: not-allowed;
-            transform: none;
-        }
-        #statusMessage {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-weight: bold;
-            padding: 0.75rem;
-            border-radius: 6px;
-            display: none;
-        }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .info { background-color: #d1ecf1; color: #0c5460; }
-        hr { margin: 2rem 0; border-color: #e9ecef; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); padding: 2em; }
+        .container { max-width: 1000px; margin: auto; }
+        .panel { background: var(--card-bg); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
+        .tab-buttons { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5em; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 500; }
+        .tab-btn.active { border-bottom: 3px solid var(--primary-color); font-weight: 600; color: var(--primary-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        #video { width: 100%; border-radius: 6px; }
+        select, button, input[type="file"] { width: 100%; padding: 0.8em; font-size: 1rem; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; }
+        button { background-color: var(--primary-color); color: white; cursor: pointer; border: none; margin-top: 1em; }
+        .thumbnails { margin-top: 1em; padding: 10px; border: 1px dashed var(--border-color); min-height: 80px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .thumbnails img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; }
+        #statusMessage { margin-top: 1em; padding: 10px; border-radius: 6px; text-align: center; font-weight: 500; display: none; }
+        .status-success { background-color: #d4edda; color: #155724; }
+        .status-error { background-color: #f8d7da; color: #721c24; }
+        .status-info { background-color: #d1ecf1; color: #0c5460; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Student Face Registration</h1>
+        <div class="panel">
+            <div class="form-group" style="margin-bottom: 2em;">
+                <label for="studentSelector" style="font-weight: 600;">Select Student:</label>
+                <select id="studentSelector" required>
+                    <option value="" disabled selected>Select a student to begin</option>
+                </select>
+            </div>
 
-<div class="container">
-    <h1>Webcam Face Registration</h1>
-    
-    <div class="form-group">
-        <label for="studentSelector">Select Student:</label>
-        <select id="studentSelector">
-            <option value="" disabled selected>Loading students...</option>
-        </select>
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openTab(event, 'webcamTab')">📷 Use Webcam</button>
+                <button class="tab-btn" onclick="openTab(event, 'uploadTab')">📂 Upload Photos</button>
+            </div>
+
+            <!-- Webcam Tab -->
+            <div id="webcamTab" class="tab-content active">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <button id="captureBtn" disabled>Capture Photo</button>
+                <div id="webcam-thumbnails" class="thumbnails"></div>
+                <button id="registerWebcamBtn" disabled>Register Captured Photos</button>
+            </div>
+
+            <!-- Upload Tab -->
+            <div id="uploadTab" class="tab-content">
+                <form id="uploadForm">
+                    <label for="fileInput">Select one or more images:</label>
+                    <input type="file" id="fileInput" name="images" multiple accept="image/*" disabled>
+                    <div id="upload-thumbnails" class="thumbnails"></div>
+                    <button type="submit" id="registerUploadBtn" disabled>Register Uploaded Photos</button>
+                </form>
+            </div>
+
+            <div id="statusMessage"></div>
+        </div>
+
+         <div class="panel" style="margin-top: 2em;">
+            <h3>Train Model</h3>
+            <p>After registering faces for at least two students, train the model.</p>
+            <form action="/face-recognition/train" method="post" id="trainForm">
+                <button type="submit">Train Recognition Model</button>
+            </form>
+        </div>
     </div>
 
-    <div id="webcamContainer" class="webcam-container">
-        <video id="webcamVideo" autoplay playsinline></video>
-        <button id="captureBtn" disabled>Capture Face (0/10)</button>
-        <label style="margin-top: 1rem;">Captured Images:</label>
-        <div id="thumbnails" class="thumbnails-container"></div>
-    </div>
-    
-    <button id="submitBtn" disabled>Register Faces</button>
-    <div id="statusMessage"></div>
-    <hr>
-    <button id="trainBtn" style="background-color: #28a745;">Train Model</button>
-</div>
+    <script>
+        // DOM Elements
+        const studentSelector = document.getElementById('studentSelector');
+        // Webcam
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('captureBtn');
+        const webcamThumbnails = document.getElementById('webcam-thumbnails');
+        const registerWebcamBtn = document.getElementById('registerWebcamBtn');
+        // Upload
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const uploadThumbnails = document.getElementById('upload-thumbnails');
+        const registerUploadBtn = document.getElementById('registerUploadBtn');
+        // Shared
+        const statusMessage = document.getElementById('statusMessage');
+        let capturedBlobs = [];
 
-<script>
-    const studentSelector = document.getElementById('studentSelector');
-    const webcamContainer = document.getElementById('webcamContainer');
-    const video = document.getElementById('webcamVideo');
-    const captureBtn = document.getElementById('captureBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const trainBtn = document.getElementById('trainBtn');
-    const thumbnailsContainer = document.getElementById('thumbnails');
-    const statusMessage = document.getElementById('statusMessage');
+        // --- Tab Logic ---
+        function openTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
 
-    const MAX_CAPTURES = 10;
-    let capturedImages = [];
-    let stream;
+        // --- Shared Logic ---
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-${type}`;
+            statusMessage.style.display = 'block';
+        }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const response = await fetch('/face-recognition/students-for-registration');
-            if (!response.ok) throw new Error('Failed to fetch student list.');
-            
-            const students = await response.json();
-            
-            studentSelector.innerHTML = '<option value="" disabled selected>Select a student</option>';
-            if (students.length === 0) {
-                studentSelector.innerHTML = '<option value="" disabled selected>No students found</option>';
-                return;
+        async function registerFaces(formData) {
+            showStatus('Uploading...', 'info');
+            try {
+                const response = await fetch('/face-recognition/register-faces', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showStatus(data.message, 'success');
+                    return true;
+                } else {
+                    showStatus(`Error: ${data.detail}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showStatus('Connection error. Please try again.', 'error');
+                return false;
             }
-
-            students.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.roll_number;
-                option.textContent = `${student.name} (${student.roll_number})`;
-                option.dataset.name = student.name;
-                studentSelector.appendChild(option);
-            });
-        } catch (error) {
-            showStatus('Error loading student list. Please refresh.', 'error');
-        }
-    });
-
-    studentSelector.addEventListener('change', async (event) => {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        resetCaptureState();
-
-        if (!event.target.value) {
-            webcamContainer.style.display = 'none';
-            return;
         }
 
-        webcamContainer.style.display = 'block';
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            video.srcObject = stream;
-            captureBtn.disabled = false;
-        } catch (err) {
-            showStatus('Could not access webcam. Please check permissions.', 'error');
-            webcamContainer.style.display = 'none';
-        }
-    });
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load Students
+            try {
+                const response = await fetch('/face-recognition/students-for-registration');
+                const students = await response.json();
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.roll_number;
+                    option.textContent = `${student.name} (${student.roll_number})`;
+                    option.dataset.name = student.name;
+                    studentSelector.appendChild(option);
+                });
+            } catch (e) { showStatus('Failed to load students.', 'error'); }
 
-    captureBtn.addEventListener('click', () => {
-        if (capturedImages.length >= MAX_CAPTURES) return;
+            // Start Webcam
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (e) { showStatus('Webcam access denied.', 'error'); }
+        });
 
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        capturedImages.push(dataUrl);
+        // --- Student Selection Logic ---
+        studentSelector.addEventListener('change', () => {
+            const studentSelected = !!studentSelector.value;
+            captureBtn.disabled = !studentSelected;
+            fileInput.disabled = !studentSelected;
 
-        const img = document.createElement('img');
-        img.src = dataUrl;
-        thumbnailsContainer.appendChild(img);
-        updateButtonStates();
-    });
+            // Reset state
+            capturedBlobs = [];
+            webcamThumbnails.innerHTML = '';
+            uploadThumbnails.innerHTML = '';
+            registerWebcamBtn.disabled = true;
+            registerUploadBtn.disabled = true;
+            fileInput.value = ''; // Clear file selection
+        });
 
-    submitBtn.addEventListener('click', async () => {
-        const selectedOption = studentSelector.options[studentSelector.selectedIndex];
-        const rollNumber = selectedOption.value;
-        const name = selectedOption.dataset.name;
+        // --- Webcam Logic ---
+        captureBtn.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        if (!rollNumber || capturedImages.length === 0) return;
+            canvas.toBlob(blob => {
+                capturedBlobs.push(blob);
+                const thumbUrl = URL.createObjectURL(blob);
+                const img = document.createElement('img');
+                img.src = thumbUrl;
+                webcamThumbnails.appendChild(img);
+                registerWebcamBtn.disabled = false;
+            }, 'image/jpeg');
+        });
 
-        setLoadingState(true, 'Registering...');
-        try {
-            const response = await fetch('/face-recognition/register-faces', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    roll_number: rollNumber,
-                    name: name,
-                    images: capturedImages
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                showStatus(data.message, 'success');
-                resetCaptureState();
-            } else {
-                showStatus(data.detail || 'An error occurred.', 'error');
+        registerWebcamBtn.addEventListener('click', async () => {
+            const selectedOption = studentSelector.options[studentSelector.selectedIndex];
+            const formData = new FormData();
+            formData.append('roll_number', selectedOption.value);
+            formData.append('name', selectedOption.dataset.name);
+            capturedBlobs.forEach((blob, i) => formData.append('images', blob, `webcam_${i}.jpg`));
+            
+            registerWebcamBtn.disabled = true;
+            const success = await registerFaces(formData);
+            if (success) {
+                capturedBlobs = [];
+                webcamThumbnails.innerHTML = '';
             }
-        } catch (error) {
-            showStatus('Failed to connect to the server.', 'error');
-        } finally {
-            setLoadingState(false);
-        }
-    });
+            registerWebcamBtn.disabled = false;
+        });
 
-    trainBtn.addEventListener('click', async function() {
-        setLoadingState(true, 'Training...');
-        showStatus('Training started... This may take a moment.', 'info');
-        try {
-            const response = await fetch('/face-recognition/train', { method: 'POST' });
-            const data = await response.json();
-            showStatus(data.message, response.ok ? 'success' : 'error');
-        } catch (error) {
-            showStatus('Failed to connect to the server.', 'error');
-        } finally {
-            setLoadingState(false);
-        }
-    });
+        // --- File Upload Logic ---
+        fileInput.addEventListener('change', () => {
+            uploadThumbnails.innerHTML = '';
+            registerUploadBtn.disabled = fileInput.files.length === 0;
+            Array.from(fileInput.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    uploadThumbnails.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
 
-    function updateButtonStates() {
-        const count = capturedImages.length;
-        captureBtn.textContent = `Capture Face (${count}/${MAX_CAPTURES})`;
-        captureBtn.disabled = count >= MAX_CAPTURES;
-        submitBtn.disabled = count === 0;
-    }
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedOption = studentSelector.options[studentSelector.selectedIndex];
+            const formData = new FormData(uploadForm);
+            formData.append('roll_number', selectedOption.value);
+            formData.append('name', selectedOption.dataset.name);
 
-    function resetCaptureState() {
-        capturedImages = [];
-        thumbnailsContainer.innerHTML = '';
-        updateButtonStates();
-    }
+            registerUploadBtn.disabled = true;
+            const success = await registerFaces(formData);
+            if (success) {
+                fileInput.value = '';
+                uploadThumbnails.innerHTML = '';
+            }
+            registerUploadBtn.disabled = false;
+        });
 
-    function showStatus(message, type) {
-        statusMessage.textContent = message;
-        statusMessage.className = type;
-        statusMessage.style.display = 'block';
-    }
-
-    function setLoadingState(isLoading, message = '') {
-        const elements = [submitBtn, trainBtn, captureBtn, studentSelector];
-        elements.forEach(el => el.disabled = isLoading);
-        if (isLoading) submitBtn.textContent = message;
-        else submitBtn.textContent = 'Register Faces';
-    }
-</script>
+    </script>
 </body>
 </html>

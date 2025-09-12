@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Attendance Upload - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff; --success: #28a745; --warning: #ffc107; --danger: #dc3545;
+            --bg-color: #f4f6f9; --card-bg: #ffffff; --text-color: #343a40;
+            --light-text: #6c757d; --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); padding: 2em; }
+        .container { max-width: 1000px; margin: auto; }
+        .panel { background: var(--card-bg); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; margin-top: 1.5em; }
+        select, button, input[type="file"] { width: 100%; padding: 0.8em; font-size: 1rem; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; }
+        button { background-color: var(--primary-color); color: white; cursor: pointer; border: none; margin-top: 1em; }
+        button:disabled { background-color: #a0c9e8; cursor: not-allowed; }
+        #imagePreview { max-width: 100%; border-radius: 6px; margin-top: 1em; display: none; }
+        #resultsList { list-style-type: none; padding: 0; margin-top: 1em; }
+        #resultsList li { padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500; }
+        .status-marked { color: var(--success); }
+        .status-already-marked { color: var(--warning); }
+        #statusMessage { margin-top: 1em; padding: 10px; border-radius: 6px; text-align: center; font-weight: 500; display: none; }
+        .status-error { background-color: #f8d7da; color: #721c24; }
+        .status-info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <header>
+                <h1>Upload Class Photo for Attendance</h1>
+                <p>Select a subject, upload a group photo, and the system will mark attendance for all recognized students.</p>
+            </header>
+            
+            <form id="uploadForm">
+                <div style="display: flex; gap: 1em; align-items: flex-end;">
+                    <div style="flex-grow: 1;">
+                        <label for="subjectSelector" style="font-weight: 500;">1. Select Subject</label>
+                        <select id="subjectSelector" name="subject" required>
+                            <option value="" disabled selected>Choose a subject...</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.subjectName }}">{{ subject.subjectName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <label for="imageFile" style="font-weight: 500;">2. Choose Photo</label>
+                        <input type="file" id="imageFile" name="image_file" accept="image/*" required>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn">3. Process Photo and Mark Attendance</button>
+            </form>
+            <div id="statusMessage"></div>
+        </div>
+
+        <div class="main-grid">
+            <div class="panel">
+                <h3>Image Preview</h3>
+                <img id="imagePreview" alt="Preview of the uploaded class photo">
+            </div>
+            <div class="panel">
+                <h3>Recognition Results</h3>
+                <ul id="resultsList">
+                    <li id="placeholder" style="color: var(--light-text);">Results will appear here after processing.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const imageFile = document.getElementById('imageFile');
+        const imagePreview = document.getElementById('imagePreview');
+        const resultsList = document.getElementById('resultsList');
+        const placeholder = document.getElementById('placeholder');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Show a preview of the image when the user selects one
+        imageFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(uploadForm);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            resultsList.innerHTML = '';
+            placeholder.style.display = 'block';
+            showStatus('Uploading and analyzing photo...', 'info');
+
+            try {
+                const response = await fetch('/attendance/mark', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const results = await response.json();
+
+                if (response.ok) {
+                    showStatus('Processing complete!', 'success');
+                    displayResults(results);
+                } else {
+                    showStatus(`Error: ${results.detail}`, 'error');
+                }
+
+            } catch (error) {
+                showStatus('An error occurred. Please check the server connection.', 'error');
+                console.error('Fetch Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '3. Process Photo and Mark Attendance';
+            }
+        });
+
+        function displayResults(results) {
+            placeholder.style.display = 'none';
+            if (!Array.isArray(results) || results.length === 0) {
+                 const li = document.createElement('li');
+                 li.textContent = 'No known students were recognized in the photo.';
+                 resultsList.appendChild(li);
+                 return;
+            }
+            results.forEach(student => {
+                const li = document.createElement('li');
+                li.textContent = `${student.name} (${student.rollNumber}) - ${student.status}`;
+                li.className = student.status === "Attendance Marked" ? "status-marked" : "status-already-marked";
+                resultsList.appendChild(li);
+            });
+        }
+        
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-${type}`;
+            statusMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

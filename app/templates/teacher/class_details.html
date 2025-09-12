@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject.subjectName }} - Class Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --sidebar-bg: #2c3e50;
+            --sidebar-link: #bdc3c7;
+            --sidebar-link-hover: #ffffff;
+            --sidebar-link-active: #3498db;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #343a40;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; font-weight: 700; text-align: center; margin-bottom: 2.5rem; color: var(--sidebar-link-hover); }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; transition: all 0.3s ease; font-weight: 500; }
+        .sidebar-nav a:hover { background-color: rgba(255, 255, 255, 0.1); color: var(--sidebar-link-hover); }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); font-weight: 600; }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; width: 24px; text-align: center; }
+        .user-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .user-profile .logout-button { display: inline-block; background-color: #e74c3c; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: 500; transition: background-color 0.3s; }
+        .user-profile .logout-button:hover { background-color: #c0392b; }
+        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .header h1 { font-size: 2.2rem; margin: 0; }
+        .header p { color: var(--light-text); font-size: 1rem; margin-top: 5px; }
+        .attendance-table-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 30px; overflow: hidden; }
+        .attendance-table { width: 100%; border-collapse: collapse; }
+        .attendance-table th, .attendance-table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .attendance-table thead { background-color: #f8f9fa; }
+        .attendance-table th { font-weight: 600; color: var(--text-color); }
+        .attendance-table tbody tr:last-child td { border-bottom: none; }
+        .attendance-table tbody tr:hover { background-color: #f1f3f5; }
+        .progress-bar-container { width: 100%; background-color: #e9ecef; border-radius: 20px; }
+        .progress-bar { height: 10px; background-color: var(--primary-color); border-radius: 20px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">SmartPresence</div>
+            <nav class="sidebar-nav">
+                <a href="/teacher/dashboard">
+                    <span class="sidebar-icon">🏠</span> Dashboard
+                </a>
+                <a href="/teacher/my-classes" class="active">
+                    <span class="sidebar-icon">📚</span> My Classes
+                </a>
+                <a href="#">
+                    <span class="sidebar-icon">🧑‍🎓</span> Students
+                </a>
+                <a href="/face-recognition/recognize">
+                    <span class="sidebar-icon">📸</span> Scan & Register
+                </a>
+            </nav>
+            <div class="user-profile">
+                <p style="margin: 0 0 10px 0;">Welcome, {{ user.name }}</p>
+                <a href="/auth/logout" class="logout-button">Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>{{ subject.subjectName }}</h1>
+                <p>Attendance summary for all enrolled students.</p>
+            </header>
+
+            <div class="attendance-table-container">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Student Name</th>
+                            <th>Attendance</th>
+                            <th>Days Present / Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in attendance_data %}
+                        <tr>
+                            <td>{{ data.student.rollNumber }}</td>
+                            <td>{{ data.student.name }}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" style="width: {{ data.percentage }}%;"></div>
+                                    </div>
+                                    <span>{{ data.percentage }}%</span>
+                                </div>
+                            </td>
+                            <td>{{ data.days_present }} / {{ data.total_class_days }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px;">No students have been marked for attendance in this class yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
