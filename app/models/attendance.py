@@ -1,11 +1,11 @@
-from sqlalchemy import (Column, Integer, String, DateTime, Time, Date, Text, Float, ForeignKey, 
+from sqlalchemy import (Column, Integer, String, DateTime, Time, Date, Text, Float, ForeignKey,
                         Enum as SQLAlchemyEnum)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from ..database.connection import Base # <-- 'Base' is imported here
+from ..database.connection import Base
 import enum
 
-# --- Enums should be defined first ---
+# --- Enums ---
 class DayOfWeek(str, enum.Enum):
     Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 
@@ -69,6 +69,7 @@ class ClassSchedule(Base):
     __tablename__ = "class_schedule"
     scheduleID = Column(Integer, primary_key=True, index=True)
     subjectID = Column(Integer, ForeignKey("subject.subjectID"), nullable=False)
+    period = Column(Integer, nullable=False)
     day_of_week = Column(SQLAlchemyEnum(DayOfWeek), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
@@ -76,7 +77,7 @@ class ClassSchedule(Base):
     subject = relationship("Subject", back_populates="schedules")
 
 
-# --- NEW Student Portal Models ---
+# --- Student Portal Models ---
 class Notification(Base):
     __tablename__ = "notification"
     notificationID = Column(Integer, primary_key=True, index=True)

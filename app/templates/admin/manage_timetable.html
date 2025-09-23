@@ -2,30 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Timetables - Admin</title>
+    <title>Manage Timetable - Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3498db; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
             --sidebar-link-active: #3498db; --bg-color: #ecf0f1; --card-bg: #ffffff;
-            --text-color: #34495e; --border-color: #e5e7eb;
+            --text-color: #34495e; --border-color: #e5e7eb; --success: #2ecc71;
+            --theory-bg: #e9f5ff; --theory-border: #90c5ea;
+            --lab-bg: #d4edda; --lab-border: #82d895;
         }
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
         .dashboard-container { display: flex; min-height: 100vh; }
         .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
-        .sidebar-nav { flex-grow: 1; }
         .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
         .sidebar-nav a.active { background-color: var(--sidebar-link-active); font-weight: 600; }
         .main-content { flex-grow: 1; padding: 40px; }
         .header h1 { font-size: 2.5rem; }
-        .form-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 30px; padding: 30px; max-width: 600px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
-        .form-group select, .form-group input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
-        .time-inputs { display: flex; gap: 15px; }
-        .action-btn { padding: 12px 25px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; background-color: var(--primary-color); color: white; }
+        .timetable-container { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5em; overflow-x: auto; }
+        .timetable { width: 100%; border-collapse: collapse; border: 1px solid var(--border-color); }
+        .timetable th, .timetable td { border: 1px solid var(--border-color); padding: 8px; text-align: center; height: 100px; min-width: 120px; }
+        .timetable th { background-color: #f8f9fa; font-weight: 600; }
+        .timetable td { cursor: pointer; transition: background-color 0.2s; }
+        .timetable td:hover { background-color: #f0f8ff; }
+        .slot-content { font-size: 0.85em; }
+        .slot-content .code { font-weight: 700; color: var(--text-color); }
+        .slot-content .subject { font-weight: 500; }
+        .slot-content .teacher { font-size: 0.9em; color: #7f8c8d; font-style: italic; }
+        .slot-theory { background-color: var(--theory-bg); border-left: 4px solid var(--theory-border); }
+        .slot-lab { background-color: var(--lab-bg); border-left: 4px solid var(--lab-border); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -34,72 +43,97 @@
             <div class="sidebar-header">Admin Panel</div>
             <nav class="sidebar-nav">
                 <a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
-                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> Manage Users</a>
-                <!-- This is now the active page -->
+                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> All Users</a>
+                <a href="/admin/manage-academics"><span class="sidebar-icon">🧑‍🏫</span> Teachers & Subjects</a>
                 <a href="/admin/manage-timetable" class="active"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
             </nav>
         </aside>
         <main class="main-content">
-            <!-- ... (inside the <main class="main-content"> section) ... -->
-<div class="main-content-header">
-    <header class="header">
-        <h1>Create Class Schedule</h1>
-    </header>
-    <!-- ADD THIS NEW BUTTON -->
-    <a href="/admin/timetable-preview" class="back-btn">View Full Timetable &rarr;</a>
-</div>
-<!-- ... (rest of the page with the form) ... -->
-            <header class="header"><h1>Create Class Schedule</h1></header>
-            <div class="form-container">
-                <form action="/admin/manage-timetable" method="post">
-                    <div class="form-group">
-                        <label for="teacher_id">Select Teacher</label>
-                        <select id="teacher_id" name="teacher_id" required>
-                            <option value="" disabled selected>Choose a teacher...</option>
-                            {% for teacher in teachers %}
-                                <option value="{{ teacher.userID }}">{{ teacher.name }} ({{ teacher.email }})</option>
+            <header class="header"><h1>Interactive Timetable Editor</h1></header>
+            <div class="timetable-container">
+                <table class="timetable">
+                    <thead>
+                        <tr>
+                            <th>Day/Period</th>
+                            {% for i in range(1, total_periods + 1) %}<th>Period {{ i }}</th>{% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day in days_of_week %}
+                        <tr>
+                            <th>{{ day }}</th>
+                            {% for period in range(1, total_periods + 1) %}
+                                {% set schedule = timetable_data.get(day, {}).get(period) %}
+                                <td class="schedule-slot" data-day="{{ day }}" data-period="{{ period }}">
+                                    {% if schedule %}
+                                    <div class="slot-content {{ 'slot-theory' if 'Lab' not in schedule.subject.subjectName else 'slot-lab' }}">
+                                        <div class="code">{{ schedule.subject.subjectCode }}</div>
+                                        <div class="subject">{{ schedule.subject.subjectName }}</div>
+                                        <div class="teacher">{{ schedule.subject.teacher.name or 'N/A' }}</div>
+                                    </div>
+                                    {% endif %}
+                                </td>
                             {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject_id">Select Subject</label>
-                        <select id="subject_id" name="subject_id" required>
-                            <option value="" disabled selected>Choose a subject...</option>
-                            {% for subject in subjects %}
-                                <option value="{{ subject.subjectID }}">{{ subject.subjectName }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="day_of_week">Day of the Week</label>
-                        <select id="day_of_week" name="day_of_week" required>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
-                    </div>
-                    <div class="form-group time-inputs">
-                        <div style="flex: 1;">
-                            <label for="start_time">Start Time</label>
-                            <input type="time" id="start_time" name="start_time" required>
-                        </div>
-                        <div style="flex: 1;">
-                            <label for="end_time">End Time</label>
-                            <input type="time" id="end_time" name="end_time" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Location (Optional)</label>
-                        <input type="text" id="location" name="location" placeholder="e.g., Room 404, Online">
-                    </div>
-                    <button type="submit" class="action-btn">Create Schedule</button>
-                </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>
+
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title">Add/Edit Schedule</h2>
+            <form id="scheduleForm" action="/admin/manage-timetable" method="post">
+                <input type="hidden" id="day_of_week" name="day_of_week">
+                <input type="hidden" id="period" name="period">
+                <div style="margin-bottom: 1em;">
+                    <label for="teacher_id">Select Teacher:</label>
+                    <select id="teacher_id" name="teacher_id" required style="width:100%; padding: 8px;">
+                        <option value="" disabled selected>-- Choose Teacher --</option>
+                        {% for teacher in all_teachers %}<option value="{{ teacher.userID }}">{{ teacher.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div style="margin-bottom: 1em;">
+                    <label for="subject_id">Select Subject:</label>
+                    <select id="subject_id" name="subject_id" required style="width:100%; padding: 8px;">
+                        <option value="" disabled selected>-- Choose Subject --</option>
+                        {% for subject in all_subjects %}<option value="{{ subject.subjectID }}">{{ subject.subjectCode }} - {{ subject.subjectName }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div style="margin-bottom: 1em;">
+                    <label for="location">Location (Optional):</label>
+                    <input type="text" id="location" name="location" style="width:100%; padding: 8px;">
+                </div>
+                <button type="submit" style="background-color: var(--success); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Save Schedule</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('scheduleModal');
+        const closeModalBtn = modal.querySelector('.close-btn');
+        const scheduleSlots = document.querySelectorAll('.schedule-slot');
+
+        scheduleSlots.forEach(slot => {
+            slot.addEventListener('click', () => {
+                const day = slot.dataset.day;
+                const period = slot.dataset.period;
+
+                document.getElementById('day_of_week').value = day;
+                document.getElementById('period').value = period;
+                modal.querySelector('h2').textContent = `Set Schedule for ${day}, Period ${period}`;
+                
+                modal.style.display = 'block';
+            });
+        });
+
+        closeModalBtn.onclick = () => { modal.style.display = 'none'; };
+        window.onclick = (event) => {
+            if (event.target == modal) { modal.style.display = 'none'; }
+        };
+    </script>
 </body>
 </html>

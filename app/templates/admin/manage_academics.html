@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Academics - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db; --sidebar-bg: #2c3e50; --sidebar-link: #bdc3c7;
+            --sidebar-link-active: #3498db; --bg-color: #ecf0f1; --card-bg: #ffffff;
+            --text-color: #34495e; --border-color: #e5e7eb; --success: #2ecc71; --assign-btn-bg: #f39c12;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { font-size: 1.6rem; text-align: center; margin-bottom: 2.5rem; }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav a { color: var(--sidebar-link); text-decoration: none; padding: 12px 15px; margin: 5px 0; display: flex; align-items: center; border-radius: 6px; }
+        .sidebar-nav a.active { background-color: var(--sidebar-link-active); font-weight: 600; color: white; }
+        .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 30px;}
+        .panel { background: var(--card-bg); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2em; }
+        .panel h2 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 1em;}
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; }
+        .full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5em; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8em; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
+        .action-btn { background-color: var(--success); color: white; border: none; padding: 0.8em 1.5em; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 1em; width: 100%; }
+        .item-table { width: 100%; border-collapse: collapse; }
+        .item-table th, .item-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .item-table thead { background-color: #f8f9fa; }
+        .assign-btn { background-color: var(--assign-btn-bg); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em;}
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Admin Panel</div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
+                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> All Users</a>
+                <a href="/admin/manage-academics" class="active"><span class="sidebar-icon">🧑‍🏫</span> Teachers & Subjects</a>
+                <a href="/admin/manage-timetable"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header"><h1>Manage Academics</h1></header>
+            <div class="panel">
+                <h2>Add New Teacher & Their First Subject</h2>
+                <form action="/admin/add-teacher-and-subject" method="post">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Teacher Name</label><input type="text" name="teacher_name" required></div>
+                        <div class="form-group"><label>Subject Name</label><input type="text" name="subject_name" required></div>
+                        <div class="form-group"><label>Teacher Email</label><input type="email" name="teacher_email" required></div>
+                        <div class="form-group"><label>Password</label><input type="password" name="password" required></div>
+                        <div class="form-group full-width"><label>Subject Description</label><input type="text" name="subject_description"></div>
+                    </div>
+                    <button type="submit" class="action-btn">Add Teacher and Assign Subject</button>
+                </form>
+            </div>
+            <div class="panel">
+                <h2>Existing Records</h2>
+                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2em;">
+                    <div>
+                        <h3>Teachers</h3>
+                        <table class="item-table">
+                            <thead><tr><th>Name</th><th>Email</th></tr></thead>
+                            <tbody>
+                                {% for teacher in teachers %}
+                                <tr><td>{{ teacher.name }}</td><td>{{ teacher.email }}</td></tr>
+                                {% else %}
+                                <tr><td colspan="2" style="text-align: center;">No teachers found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3>Subjects</h3>
+                        <table class="item-table">
+                            <thead><tr><th>Name</th><th>Assigned Teacher</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                {% for subject in subjects %}
+                                <tr>
+                                    <td>{{ subject.subjectName }}</td>
+                                    <td>{{ subject.teacher.name or 'Unassigned' }}</td>
+                                    <td>
+                                        <button class="assign-btn" data-subject-id="{{ subject.subjectID }}" data-subject-name="{{ subject.subjectName }}">Assign/Change</button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" style="text-align: center;">No subjects found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="assignModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title">Assign Teacher</h2>
+            <form id="assignForm" action="/admin/assign-teacher" method="post">
+                <input type="hidden" id="modal_subject_id" name="subject_id">
+                <div class="form-group">
+                    <label for="teacher_id">Select Teacher:</label>
+                    <select id="teacher_id" name="teacher_id" required>
+                        <option value="" disabled selected>-- Choose a Teacher --</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.userID }}">{{ teacher.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="action-btn">Save Assignment</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const modal = document.getElementById('assignModal');
+        const closeModalBtn = modal.querySelector('.close-btn');
+        const assignBtns = document.querySelectorAll('.assign-btn');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubjectIdInput = document.getElementById('modal_subject_id');
+        assignBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const subjectId = btn.dataset.subjectId;
+                const subjectName = btn.dataset.subjectName;
+                modalTitle.textContent = `Assign Teacher for: ${subjectName}`;
+                modalSubjectIdInput.value = subjectId;
+                modal.style.display = 'block';
+            });
+        });
+        closeModalBtn.onclick = () => { modal.style.display = 'none'; };
+        window.onclick = (event) => { if (event.target == modal) { modal.style.display = 'none'; } };
+    </script>
+</body>
+</html>

@@ -14,8 +14,6 @@
         }
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); }
         .dashboard-container { display: flex; min-height: 100vh; }
-        
-        /* --- Sidebar Styles --- */
         .sidebar {
             width: 260px;
             background-color: var(--sidebar-bg);
@@ -31,8 +29,6 @@
         .sidebar-nav a:hover { background-color: rgba(255, 255, 255, 0.1); color: var(--sidebar-link-hover); }
         .sidebar-nav a.active { background-color: var(--sidebar-link-active); color: var(--sidebar-link-hover); }
         .sidebar-icon { font-size: 1.2rem; margin-right: 15px; }
-
-        /* --- NEW: User Profile & Logout Button Styles --- */
         .user-profile {
             margin-top: auto;
             padding-top: 20px;
@@ -45,7 +41,7 @@
             color: var(--sidebar-link);
         }
         .user-profile .logout-button {
-            display: block; /* Make it a full-width button */
+            display: block;
             width: 100%;
             background-color: var(--danger);
             color: white;
@@ -59,8 +55,6 @@
         .user-profile .logout-button:hover {
             background-color: #c0392b;
         }
-        /* --- END OF NEW STYLES --- */
-
         .main-content { flex-grow: 1; padding: 40px; }
         .header h1 { font-size: 2.5rem; }
         .header p { color: var(--light-text); font-size: 1.1rem; }
@@ -78,37 +72,16 @@
         <aside class="sidebar">
             <div class="sidebar-header">Admin Panel</div>
             <nav class="sidebar-nav">
-                <!-- Inside the <nav class="sidebar-nav"> of all admin templates -->
-                    <!-- Inside the <nav class="sidebar-nav"> of all admin templates -->
-<a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
-<a href="/admin/manage-users"><span class="sidebar-icon">👥</span> All Users</a>
-
-<!-- ADD THESE NEW LINKS -->
-<a href="/admin/manage-teachers"><span class="sidebar-icon">🧑‍🏫</span> Manage Teachers</a>
-<a href="/admin/manage-subjects"><span class="sidebar-icon">📚</span> Manage Subjects</a>
-
-<a href="/admin/manage-timetable"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
-<!-- ... other links -->
-<a href="/admin/dashboard"><span class="sidebar-icon">🏠</span> Dashboard</a>
-<a href="/admin/manage-users"><span class="sidebar-icon">👥</span> Manage Users</a>
-
-<!-- ADD THIS NEW LINK -->
-<a href="/admin/manage-timetable"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
-
-<!-- You might rename this one or keep it -->
-<a href="/admin/site-settings"><span class="sidebar-icon">🌐</span> Site Content</a>
                 <a href="/admin/dashboard" class="active"><span class="sidebar-icon">🏠</span> Dashboard</a>
-                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> Manage Users</a>
-                <a href="/admin/site-settings"><span class="sidebar-icon">🌐</span> Site Content</a>
-                <a href="/admin/calendar-events"><span class="sidebar-icon">🗓️</span> Calendar & Events</a>
+                <a href="/admin/manage-users"><span class="sidebar-icon">👥</span> All Users</a>
+                <a href="/admin/manage-academics"><span class="sidebar-icon">🧑‍🏫</span> Teachers & Subjects</a>
+                <a href="/admin/manage-timetable"><span class="sidebar-icon">🗓️</span> Manage Timetable</a>
             </nav>
             
-            <!-- --- ADD THIS USER PROFILE BLOCK --- -->
             <div class="user-profile">
                 <p>Welcome, {{ user.name }}</p>
                 <a href="/auth/logout" class="logout-button">Logout</a>
             </div>
-            <!-- --- END OF BLOCK TO ADD --- -->
 
         </aside>
         <main class="main-content">
@@ -125,9 +98,9 @@
 
             <h2 class="section-title">System Management</h2>
             <section class="actions-grid">
-                <a href="/admin/manage-users" class="action-card"><h3>Create & Manage Accounts</h3><p>Create batches, allot accounts, and edit profiles for students and teachers.</p></a>
-                <a href="/admin/calendar-events" class="action-card"><h3>Publish Notifications</h3><p>Issue circulars, alerts, and manage the official event calendar.</p></a>
-                <a href="/admin/site-settings" class="action-card"><h3>Manage Site Content</h3><p>Update newsletters, photo galleries, and 'About Us' information.</p></a>
+                <a href="/admin/manage-users" class="action-card"><h3>Manage User Accounts</h3><p>View, edit, or delete accounts for all users.</p></a>
+                <a href="/admin/manage-academics" class="action-card"><h3>Teachers & Subjects</h3><p>Create new teacher accounts and add/assign subjects.</p></a>
+                <a href="/admin/manage-timetable" class="action-card"><h3>Create Timetable</h3><p>Assign subjects to specific time slots in the schedule.</p></a>
             </section>
         </main>
     </div>
