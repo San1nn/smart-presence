@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Registration - Teacher Dashboard</title>
+    <title>Face Management - Teacher Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,8 +13,8 @@
         }
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color); padding: 2em; }
         .container { max-width: 1000px; margin: auto; }
-        .panel { background: var(--card-bg); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
+        .panel { background: var(--card-bg); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2em; }
+        h1, h2 { color: var(--text-color); }
         .tab-buttons { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5em; }
         .tab-btn { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 500; }
         .tab-btn.active { border-bottom: 3px solid var(--primary-color); font-weight: 600; color: var(--primary-color); }
@@ -33,13 +33,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Student Face Registration</h1>
+        <h1>Face Management Module</h1>
+        
         <div class="panel">
+            <h2>Step 1 & 2: Register Student Photos</h2>
             <div class="form-group" style="margin-bottom: 2em;">
                 <label for="studentSelector" style="font-weight: 600;">Select Student:</label>
-                <select id="studentSelector" required>
-                    <option value="" disabled selected>Select a student to begin</option>
-                </select>
+                <select id="studentSelector" required><option value="" disabled selected>Select a student to begin</option></select>
             </div>
 
             <div class="tab-buttons">
@@ -65,13 +65,12 @@
                     <button type="submit" id="registerUploadBtn" disabled>Register Uploaded Photos</button>
                 </form>
             </div>
-
             <div id="statusMessage"></div>
         </div>
 
-         <div class="panel" style="margin-top: 2em;">
-            <h3>Train Model</h3>
-            <p>After registering faces for at least two students, train the model.</p>
+        <div class="panel">
+            <h2>Step 3: Finalize and Train Model</h2>
+            <p>After registering photos for <strong>at least two different students</strong>, click the button below to train the recognition model. This will create the `Trainner.yml` file.</p>
             <form action="/face-recognition/train" method="post" id="trainForm">
                 <button type="submit">Train Recognition Model</button>
             </form>
@@ -79,24 +78,22 @@
     </div>
 
     <script>
-        // DOM Elements
+        // --- THIS SCRIPT IS FROM THE "add a photo upload option" step and is correct ---
+        // It handles both webcam and upload and posts to /register-faces
+        // No changes are needed in the script itself.
         const studentSelector = document.getElementById('studentSelector');
-        // Webcam
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const captureBtn = document.getElementById('captureBtn');
         const webcamThumbnails = document.getElementById('webcam-thumbnails');
         const registerWebcamBtn = document.getElementById('registerWebcamBtn');
-        // Upload
         const uploadForm = document.getElementById('uploadForm');
         const fileInput = document.getElementById('fileInput');
         const uploadThumbnails = document.getElementById('upload-thumbnails');
         const registerUploadBtn = document.getElementById('registerUploadBtn');
-        // Shared
         const statusMessage = document.getElementById('statusMessage');
         let capturedBlobs = [];
 
-        // --- Tab Logic ---
         function openTab(evt, tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -104,7 +101,6 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // --- Shared Logic ---
         function showStatus(message, type) {
             statusMessage.textContent = message;
             statusMessage.className = `status-${type}`;
@@ -114,10 +110,7 @@
         async function registerFaces(formData) {
             showStatus('Uploading...', 'info');
             try {
-                const response = await fetch('/face-recognition/register-faces', {
-                    method: 'POST',
-                    body: formData,
-                });
+                const response = await fetch('/face-recognition/register-faces', { method: 'POST', body: formData });
                 const data = await response.json();
                 if (response.ok) {
                     showStatus(data.message, 'success');
@@ -127,14 +120,12 @@
                     return false;
                 }
             } catch (error) {
-                showStatus('Connection error. Please try again.', 'error');
+                showStatus('Connection error.', 'error');
                 return false;
             }
         }
 
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', async () => {
-            // Load Students
             try {
                 const response = await fetch('/face-recognition/students-for-registration');
                 const students = await response.json();
@@ -147,35 +138,29 @@
                 });
             } catch (e) { showStatus('Failed to load students.', 'error'); }
 
-            // Start Webcam
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
             } catch (e) { showStatus('Webcam access denied.', 'error'); }
         });
 
-        // --- Student Selection Logic ---
         studentSelector.addEventListener('change', () => {
             const studentSelected = !!studentSelector.value;
             captureBtn.disabled = !studentSelected;
             fileInput.disabled = !studentSelected;
-
-            // Reset state
             capturedBlobs = [];
             webcamThumbnails.innerHTML = '';
             uploadThumbnails.innerHTML = '';
             registerWebcamBtn.disabled = true;
             registerUploadBtn.disabled = true;
-            fileInput.value = ''; // Clear file selection
+            fileInput.value = '';
         });
 
-        // --- Webcam Logic ---
         captureBtn.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
             canvas.toBlob(blob => {
                 capturedBlobs.push(blob);
                 const thumbUrl = URL.createObjectURL(blob);
@@ -193,16 +178,13 @@
             formData.append('name', selectedOption.dataset.name);
             capturedBlobs.forEach((blob, i) => formData.append('images', blob, `webcam_${i}.jpg`));
             
-            registerWebcamBtn.disabled = true;
             const success = await registerFaces(formData);
             if (success) {
                 capturedBlobs = [];
                 webcamThumbnails.innerHTML = '';
             }
-            registerWebcamBtn.disabled = false;
         });
 
-        // --- File Upload Logic ---
         fileInput.addEventListener('change', () => {
             uploadThumbnails.innerHTML = '';
             registerUploadBtn.disabled = fileInput.files.length === 0;
@@ -224,15 +206,12 @@
             formData.append('roll_number', selectedOption.value);
             formData.append('name', selectedOption.dataset.name);
 
-            registerUploadBtn.disabled = true;
             const success = await registerFaces(formData);
             if (success) {
                 fileInput.value = '';
                 uploadThumbnails.innerHTML = '';
             }
-            registerUploadBtn.disabled = false;
         });
-
     </script>
 </body>
 </html>

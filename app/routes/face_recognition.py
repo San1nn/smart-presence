@@ -272,3 +272,95 @@ async def register_student_faces(
 @router.post("/train")
 def train_model_endpoint():
     return face_rec_service.train_model()
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
+from typing import List
+
+from ..database.connection import get_db
+from ..services import face_rec_service
+from ..services.auth_service import get_current_user_from_cookie
+from ..models.attendance import User, Student
+
+templates = Jinja2Templates(directory="app/templates")
+router = APIRouter(prefix="/face-recognition", tags=["Face Recognition"])
+
+@router.get("/recognize", response_class=HTMLResponse)
+async def get_face_recognition_page(request: Request):
+    """Serves the main, unified face management page."""
+    return templates.TemplateResponse("teacher/face_recognition.html", {"request": request})
+
+@router.get("/students-for-registration", response_class=HTMLResponse)
+async def get_students_for_registration(db: Session = Depends(get_db)):
+    """Gets a list of all registered students for the dropdown."""
+    students = db.query(Student).order_by(Student.name).all()
+    return [{"roll_number": s.rollNumber, "name": s.name} for s in students]
+
+@router.post("/register-faces")
+async def register_student_faces(
+    roll_number: str = Form(...), name: str = Form(...),
+    images: List[UploadFile] = File(...), db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_cookie)
+):
+    """Receives student details and a list of face images and saves them."""
+    if current_user.role.value != 'teacher':
+        raise HTTPException(status_code=403, detail="Not authorized.")
+    
+    face_rec_service.add_student_db(db=db, roll_number=roll_number, name=name)
+    return await face_rec_service.save_face_images(roll_number, name, images)
+
+@router.post("/train")
+def train_model_endpoint(current_user: User = Depends(get_current_user_from_cookie)):
+    """Triggers the model training process."""
+    if current_user.role.value != 'teacher':
+        raise HTTPException(status_code=403, detail="Not authorized.")
+    return face_rec_service.train_model()
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
+from typing import List
+
+from ..database.connection import get_db
+from ..services import face_rec_service
+from ..services.auth_service import get_current_user_from_cookie
+from ..models.attendance import User, Student
+
+templates = Jinja2Templates(directory="app/templates")
+router = APIRouter(prefix="/face-recognition", tags=["Face Recognition"])
+
+
+@router.get("/recognize", response_class=HTMLResponse)
+async def get_face_recognition_page(request: Request):
+    return templates.TemplateResponse("teacher/face_recognition.html", {"request": request})
+
+
+# --- FIX: Change to async and remove the incorrect response_class ---
+@router.get("/students-for-registration")
+async def get_students_for_registration(db: Session = Depends(get_db)):
+    """
+    Gets a list of all registered students. FastAPI will automatically
+    convert the returned list into a proper JSON response.
+    """
+    students = db.query(Student).order_by(Student.name).all()
+    return [{"roll_number": s.rollNumber, "name": s.name} for s in students]
+# --- END OF FIX ---
+
+
+@router.post("/register-faces")
+async def register_student_faces(
+    roll_number: str = Form(...), name: str = Form(...),
+    images: List[UploadFile] = File(...), db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_cookie)
+):
+    if current_user.role.value != 'teacher':
+        raise HTTPException(status_code=403, detail="Not authorized.")
+    
+    face_rec_service.add_student_db(db=db, roll_number=roll_number, name=name)
+    return await face_rec_service.save_face_images(roll_number, name, images)
+
+
+@router.post("/train")
+def train_model_endpoint(current_user: User = Depends(get_current_user_from_cookie)):
+    if current_user.role.value != 'teacher':
+        raise HTTPException(status_code=403, detail="Not authorized.")
+    return face_rec_service.train_model()
