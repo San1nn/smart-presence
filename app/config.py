@@ -13,7 +13,7 @@ TRAINED_MODEL_DIR.mkdir(exist_ok=True)
 TRAINED_MODEL_PATH = TRAINED_MODEL_DIR / "Trainner.yml"
 
 # Database URL
-DATABASE_URL = "mysql+pymysql://root:@localhost/smart_presence"
+DATABASE_URL = "mysql+pymysql://root:root@localhost/smart_presence"
 
 # Recognition confidence
 RECOGNITION_CONFIDENCE_THRESHOLD = 70.0
